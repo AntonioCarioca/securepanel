@@ -30,6 +30,7 @@
         <button type="submit">Entrar</button>
     </form>
 
+    <p><a href="/forgot-password">Esqueci minha senha</a></p>
     <p><a href="/register">Criar conta</a></p>
 </body>
 </html>

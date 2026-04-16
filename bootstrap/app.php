@@ -2,6 +2,21 @@
 
 declare(strict_types=1);
 
+/**
+ * BOOTSTRAP DA APLICAÇÃO
+ *
+ * Este arquivo é responsável por preparar o ambiente da aplicação.
+ * Ele NÃO executa lógica de negócio.
+ *
+ * Responsabilidades:
+ * - Carregar autoload do Composer
+ * - Iniciar sessão
+ * - Carregar variáveis de ambiente (.env)
+ * - Configurar banco de dados (Eloquent)
+ * - Definir timezone
+ * - Disponibilizar helpers globais
+ */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dotenv\Dotenv;
