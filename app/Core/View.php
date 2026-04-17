@@ -4,20 +4,31 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use League\Plates\Engine;
+
 class View
 {
-    public static function render(string $view, array $data = []): void
+    private static ?Engine $engine = null;
+
+    protected static function engine(): Engine
     {
-        extract($data);
+        if (self::$engine === null) {
+            self::$engine = new Engine(dirname(__DIR__) . '/Views');
 
-        $viewPath = dirname(__DIR__) . '/Views/' . str_replace('.', '/', $view) . '.php';
+            self::$engine->addData([
+                'authUser' => auth(),
+            ]);
 
-        if (!file_exists($viewPath)) {
-            http_response_code(404);
-            echo "View não encontrada: {$view}";
-            return;
+            self::$engine->registerFunction('csrf_token', fn() => csrf_token());
+            self::$engine->registerFunction('old', fn(string $key, mixed $default = '') => old($key, $default));
+            self::$engine->registerFunction('flash', fn(string $key, mixed $default = null) => getFlash($key, $default));
         }
 
-        require $viewPath;
+        return self::$engine;
+    }
+
+    public static function render(string $view, array $data = []): void
+    {
+        echo self::engine()->render($view, $data);
     }
 }

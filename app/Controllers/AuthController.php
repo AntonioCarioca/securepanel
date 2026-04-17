@@ -16,7 +16,7 @@ class AuthController
             redirect('/dashboard');
         }
 
-        View::render('auth.login');
+        View::render('auth/login');
     }
 
     public function login(): void
@@ -67,7 +67,7 @@ class AuthController
             redirect('/dashboard');
         }
 
-        View::render('auth.register');
+        View::render('auth/register');
     }
 
     public function register(): void

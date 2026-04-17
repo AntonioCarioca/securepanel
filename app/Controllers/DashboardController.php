@@ -23,7 +23,7 @@ class DashboardController
             redirect('/login');
         }
 
-        View::render('dashboard.index', [
+        View::render('dashboard/index', [
             'user' => auth(),
         ]);
     }

@@ -14,7 +14,7 @@ class PasswordResetController
 {
     public function showForgotPassword(): void
     {
-        View::render('auth.forgot-password');
+        View::render('auth/forgot-password');
     }
 
     public function sendResetLink(): void
@@ -100,7 +100,7 @@ class PasswordResetController
             redirect('/forgot-password');
         }
 
-        View::render('auth.reset-password', [
+        View::render('auth/reset-password', [
             'token' => $token,
         ]);
     }

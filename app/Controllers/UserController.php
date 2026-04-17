@@ -17,7 +17,7 @@ class UserController
 
         $users = User::orderBy('id', 'desc')->get();
 
-        View::render('users.index', [
+        View::render('users/index', [
             'users' => $users,
         ]);
     }
@@ -26,7 +26,7 @@ class UserController
     {
         AdminMiddleware::handle();
 
-        View::render('users.create');
+        View::render('users/create');
     }
 
     public function store(): void
@@ -87,7 +87,7 @@ class UserController
             redirect('/users');
         }
 
-        View::render('users.edit', [
+        View::render('users/edit', [
             'editUser' => $user,
         ]);
     }
