@@ -43,7 +43,7 @@ switch ($routeInfo[0]) {
 
         try {
             $controller = new $class();
-            call_user_func_array([$controller, $method], $vars);
+            call_user_func([$controller, $method], $vars);
         } catch (Throwable $e) {
             http_response_code(500);
 

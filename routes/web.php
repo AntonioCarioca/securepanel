@@ -14,6 +14,7 @@
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\PasswordResetController;
+use App\Controllers\UserController;
 
 return [
     // Autenticação
@@ -32,4 +33,12 @@ return [
     ['POST', '/forgot-password', [PasswordResetController::class, 'sendResetLink']],
     ['GET', '/reset-password', [PasswordResetController::class, 'showResetPassword']],
     ['POST', '/reset-password', [PasswordResetController::class, 'resetPassword']],
+
+    // Usuário
+    ['GET', '/users', [UserController::class, 'index']],
+    ['GET', '/users/create', [UserController::class, 'showCreate']],
+    ['POST', '/users', [UserController::class, 'store']],
+    ['GET', '/users/{id:\d+}/edit', [UserController::class, 'showEdit']],
+    ['POST', '/users/{id:\d+}/update', [UserController::class, 'update']],
+    ['POST', '/users/{id:\d+}/delete', [UserController::class, 'destroy']],
 ];
