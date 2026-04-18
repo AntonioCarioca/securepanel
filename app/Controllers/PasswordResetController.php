@@ -8,17 +8,22 @@ use App\Core\Mailer;
 use App\Core\View;
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Middleware\GuestMiddleware;
 use Respect\Validation\Validator as v;
 
 class PasswordResetController
 {
     public function showForgotPassword(): void
     {
+        GuestMiddleware::handle();
+
         View::render('auth/forgot-password');
     }
 
     public function sendResetLink(): void
     {
+        GuestMiddleware::handle();
+        
         $_SESSION['_old'] = $_POST;
 
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {
@@ -80,6 +85,8 @@ class PasswordResetController
 
     public function showResetPassword(): void
     {
+        GuestMiddleware::handle();
+
         $token = $_GET['token'] ?? '';
 
         if (!is_string($token) || trim($token) === '') {
@@ -107,6 +114,8 @@ class PasswordResetController
 
     public function resetPassword(): void
     {
+        GuestMiddleware::handle();
+
         $_SESSION['_old'] = $_POST;
 
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {

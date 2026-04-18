@@ -7,20 +7,21 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Models\User;
 use Respect\Validation\Validator as v;
+use App\Middleware\GuestMiddleware;
 
 class AuthController
 {
     public function showLogin(): void
     {
-        if (!guest()) {
-            redirect('/dashboard');
-        }
+        GuestMiddleware::handle();
 
         View::render('auth/login');
     }
 
     public function login(): void
     {
+        GuestMiddleware::handle();
+
         $_SESSION['_old'] = $_POST;
 
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {
@@ -63,15 +64,15 @@ class AuthController
 
     public function showRegister(): void
     {
-        if (!guest()) {
-            redirect('/dashboard');
-        }
+        GuestMiddleware::handle();
 
         View::render('auth/register');
     }
 
     public function register(): void
     {
+        GuestMiddleware::handle();
+        
         $_SESSION['_old'] = $_POST;
 
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {
