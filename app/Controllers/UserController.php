@@ -253,4 +253,82 @@ class UserController
         flash('success', 'Usuário excluído com sucesso.');
         redirect('/users');
     }
+
+    public function exportCsv(array $params = []): void
+    {
+        AdminMiddleware::handle();
+
+        $search = trim($_GET['search'] ?? '');
+        $role = trim($_GET['role'] ?? '');
+        $sort = trim($_GET['sort'] ?? 'created_at');
+        $direction = trim($_GET['direction'] ?? 'desc');
+
+        $allowedSorts = ['name', 'email', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+        $allowedRoles = ['admin', 'user'];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
+        if ($role !== '' && !in_array($role, $allowedRoles, true)) {
+            $role = '';
+        }
+
+        $query = User::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($role !== '') {
+            $query->where('role', $role);
+        }
+
+        $users = $query
+            ->orderBy($sort, $direction)
+            ->get(['id', 'name', 'email', 'role', 'created_at']);
+
+        $filename = 'usuarios_' . date('Y-m-d_H-i-s') . '.csv';
+
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+
+        if ($output === false) {
+            http_response_code(500);
+            echo 'Não foi possível gerar o arquivo CSV.';
+            exit;
+        }
+
+        // BOM para melhor compatibilidade com Excel
+        fwrite($output, "\xEF\xBB\xBF");
+
+        fputcsv($output, ['ID', 'Nome', 'E-mail', 'Perfil', 'Criado em'], ';', '"', '\\');
+
+        foreach ($users as $user) {
+            fputcsv($output, [
+                $user->id,
+                $user->name,
+                $user->email,
+                $user->role,
+                date('d/m/Y H:i', strtotime((string) $user->created_at)),
+            ], ';', '"', '\\');
+        }
+
+        fclose($output);
+        exit;
+    }
 }

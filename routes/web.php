@@ -37,8 +37,9 @@ return [
     // Usuário
     ['GET', '/users', [UserController::class, 'index']],
     ['GET', '/users/create', [UserController::class, 'showCreate']],
-    ['POST', '/users', [UserController::class, 'store']],
+    ['GET', '/users/export', [UserController::class, 'exportCsv']],
     ['GET', '/users/{id:\d+}/edit', [UserController::class, 'showEdit']],
+    ['POST', '/users', [UserController::class, 'store']],
     ['POST', '/users/{id:\d+}/update', [UserController::class, 'update']],
     ['POST', '/users/{id:\d+}/delete', [UserController::class, 'destroy']],
 ];

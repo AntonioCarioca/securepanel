@@ -28,27 +28,94 @@
         </select>
     </div>
 
-    <div style="margin-bottom: 12px;">
-        <label for="sort">Ordenar por</label><br>
-        <select id="sort" name="sort">
-            <option value="created_at" <?= ($sort ?? '') === 'created_at' ? 'selected' : '' ?>>Data</option>
-            <option value="name" <?= ($sort ?? '') === 'name' ? 'selected' : '' ?>>Nome</option>
-            <option value="email" <?= ($sort ?? '') === 'email' ? 'selected' : '' ?>>E-mail</option>
-        </select>
-    </div>
-
-    <div style="margin-bottom: 12px;">
-        <label for="direction">Direção</label><br>
-        <select id="direction" name="direction">
-            <option value="asc" <?= ($direction ?? '') === 'asc' ? 'selected' : '' ?>>Crescente</option>
-            <option value="desc" <?= ($direction ?? '') === 'desc' ? 'selected' : '' ?>>Decrescente</option>
-        </select>
-    </div>
-
     <button type="submit">Aplicar</button>
 
     <a href="/users" style="margin-left: 10px;">Limpar filtros</a>
 </form>
+
+<?php
+    $exportQuery = [];
+
+    if (!empty($search)) {
+        $exportQuery['search'] = $search;
+    }
+
+    if (!empty($role)) {
+        $exportQuery['role'] = $role;
+    }
+
+    if (!empty($sort)) {
+        $exportQuery['sort'] = $sort;
+    }
+
+    if (!empty($direction)) {
+        $exportQuery['direction'] = $direction;
+    }
+
+    $exportUrl = '/users/export';
+
+    if (!empty($exportQuery)) {
+        $exportUrl .= '?' . http_build_query($exportQuery);
+    }
+?>
+
+<p style="margin-bottom: 16px;">
+    <a href="<?= $this->e($exportUrl) ?>">Exportar CSV</a>
+</p>
+
+<?php
+    $activeFilters = [];
+
+    if (!empty($search)) {
+        $activeFilters[] = 'Busca: "' . $this->e($search) . '"';
+    }
+
+    if (!empty($role)) {
+        $activeFilters[] = 'Perfil: ' . $this->e(strtoupper($role));
+    }
+
+    if (!empty($sort) && !($sort === 'created_at' && $direction === 'desc')) {
+        $sortLabels = [
+            'name' => 'Nome',
+            'email' => 'E-mail',
+            'created_at' => 'Data',
+        ];
+
+        $directionLabels = [
+            'asc' => 'crescente',
+            'desc' => 'decrescente',
+        ];
+
+        $sortText = $sortLabels[$sort] ?? $sort;
+        $directionText = $directionLabels[$direction] ?? $direction;
+
+        $activeFilters[] = 'Ordenação: ' . $this->e($sortText . ' (' . $directionText . ')');
+    }
+?>
+
+<?php if (!empty($activeFilters)): ?>
+    <div style="margin-bottom: 16px;">
+        <strong>Filtros ativos:</strong>
+
+        <div style="margin-top: 8px;">
+            <?php foreach ($activeFilters as $filter): ?>
+                <span style="
+                    display: inline-block;
+                    background: #f1f5f9;
+                    border: 1px solid #cbd5e1;
+                    border-radius: 999px;
+                    padding: 6px 10px;
+                    margin: 4px 6px 4px 0;
+                    font-size: 14px;
+                ">
+                    <?= $filter ?>
+                </span>
+            <?php endforeach; ?>
+
+            <a href="/users" style="margin-left: 8px;">Limpar todos</a>
+        </div>
+    </div>
+<?php endif; ?>
 
 <p>
     Total de registros: <?= (int) ($total ?? 0) ?>
@@ -56,11 +123,57 @@
 
 <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse;">
     <thead>
+        <?php
+            $buildSortUrl = function (string $column) use ($search, $role, $sort, $direction): string {
+                $newDirection = 'asc';
+
+                if ($sort === $column) {
+                    $newDirection = $direction === 'asc' ? 'desc' : 'asc';
+                }
+
+                $query = [
+                    'sort' => $column,
+                    'direction' => $newDirection,
+                    'page' => 1,
+                ];
+
+                if (!empty($search)) {
+                    $query['search'] = $search;
+                }
+
+                if (!empty($role)) {
+                    $query['role'] = $role;
+                }
+
+                return '/users?' . http_build_query($query);
+            };
+
+            $sortIndicator = function (string $column) use ($sort, $direction): string {
+                if ($sort !== $column) {
+                    return '';
+                }
+
+                return $direction === 'asc' ? ' ↑' : ' ↓';
+            };
+        ?>
         <tr>
             <th>ID</th>
-            <th>Nome</th>
-            <th>E-mail</th>
+            <th>
+                <a href="<?= $this->e($buildSortUrl('name')) ?>">
+                    Nome<?= $this->e($sortIndicator('name')) ?>
+                </a>
+            </th>
+            <th>
+                <a href="<?= $this->e($buildSortUrl('email')) ?>">
+                    E-mail<?= $this->e($sortIndicator('email')) ?>
+                </a>
+            </th>
             <th>Perfil</th>
+            <th>
+                <a href="<?= $this->e($buildSortUrl('created_at')) ?>">
+                    Data<?= $this->e($sortIndicator('created_at')) ?>
+                </a>
+            </th>
             <th>Ações</th>
         </tr>
     </thead>
@@ -69,9 +182,39 @@
             <?php foreach ($users as $user): ?>
                 <tr>
                     <td><?= (int) $user->id ?></td>
+
                     <td><?= $this->e($user->name) ?></td>
+
                     <td><?= $this->e($user->email) ?></td>
-                    <td><?= $this->e($user->role) ?></td>
+
+                    <td>
+                        <?php if ($user->role === 'admin'): ?>
+                            <span style="
+                                background: #e53935;
+                                color: #fff;
+                                padding: 4px 8px;
+                                border-radius: 6px;
+                                font-size: 12px;
+                            ">
+                                ADMIN
+                            </span>
+                        <?php else: ?>
+                            <span style="
+                                background: #1e88e5;
+                                color: #fff;
+                                padding: 4px 8px;
+                                border-radius: 6px;
+                                font-size: 12px;
+                            ">
+                                USER
+                            </span>
+                        <?php endif; ?>
+                    </td>
+
+                    <td>
+                        <?= $this->e(formatDate($user->created_at)) ?>
+                    </td>
+
                     <td>
                         <a href="/users/<?= (int) $user->id ?>/edit">Editar</a>
 
@@ -86,7 +229,7 @@
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="5">Nenhum usuário encontrado.</td>
+                <td colspan="6">Nenhum usuário encontrado.</td>
             </tr>
         <?php endif; ?>
     </tbody>
