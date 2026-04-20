@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
+use App\Core\ApiResponse;
 
 require_once __DIR__ . '/../bootstrap/app.php';
 
@@ -34,12 +35,7 @@ switch ($routeInfo[0]) {
         http_response_code(404);
 
         if (str_starts_with($uri, '/api/')) {
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'success' => false,
-                'message' => 'Rota não encontrada.',
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-            break;
+            ApiResponse::error('Rota não encontrada.', 404);
         }
 
         \App\Core\View::render('errors/404');
@@ -49,12 +45,7 @@ switch ($routeInfo[0]) {
         http_response_code(405);
 
         if (str_starts_with($uri, '/api/')) {
-            header('Content-Type: application/json; charset=utf-8');
-            echo json_encode([
-                'success' => false,
-                'message' => 'Método não permitido.',
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-            break;
+            ApiResponse::error('Método não permitido.', 405);
         }
 
         echo '405 - Método não permitido';
@@ -68,31 +59,13 @@ switch ($routeInfo[0]) {
             $controller = new $class();
             call_user_func([$controller, $method], $vars);
         } catch (Throwable $e) {
-            http_response_code(500);
-
             if (str_starts_with($uri, '/api/')) {
-                header('Content-Type: application/json; charset=utf-8');
-
-                $response = [
-                    'success' => false,
-                    'message' => 'Erro interno do servidor.',
-                ];
 
                 if (config('APP_DEBUG', 'false') === 'true') {
-                    $response['error'] = $e->getMessage();
+                    ApiResponse::error('Erro interno do servidor.',500,['error' => $e->getMessage(),]);
                 }
 
-                echo json_encode(
-                    $response,
-                    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT
-                );
-                break;
-            }
-
-            if (config('APP_DEBUG', 'false') === 'true') {
-                echo '<pre>' . htmlspecialchars($e->getMessage()) . "\n\n" . htmlspecialchars($e->getTraceAsString()) . '</pre>';
-            } else {
-                \App\Core\View::render('errors/500');
+                ApiResponse::error('Erro interno do servidor.', 500);
             }
         }
 

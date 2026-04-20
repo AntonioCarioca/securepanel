@@ -114,3 +114,8 @@ function verify_csrf_token(?string $token): bool
 {
     return isset($_SESSION['_csrf']) && is_string($token) && hash_equals($_SESSION['_csrf'], $token);
 }
+
+function formatDate(string $date): string
+{
+    return date('d/m/Y H:i', strtotime($date));
+}
