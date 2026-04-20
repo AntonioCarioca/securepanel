@@ -11,14 +11,78 @@ use Respect\Validation\Validator as v;
 
 class UserController
 {
-    public function index(): void
+    
+    public function index(array $params = []): void
     {
         AdminMiddleware::handle();
 
-        $users = User::orderBy('id', 'desc')->get();
+        $search = trim($_GET['search'] ?? '');
+        $role = trim($_GET['role'] ?? '');
+        $sort = trim($_GET['sort'] ?? 'created_at');
+        $direction = trim($_GET['direction'] ?? 'desc');
+        $page = (int) ($_GET['page'] ?? 1);
+        $perPage = 10;
+
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        $allowedSorts = ['name', 'email', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+        $allowedRoles = ['admin', 'user'];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
+        if ($role !== '' && !in_array($role, $allowedRoles, true)) {
+            $role = '';
+        }
+
+        $query = User::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($role !== '') {
+            $query->where('role', $role);
+        }
+
+        $total = (clone $query)->count();
+        $totalPages = (int) ceil($total / $perPage);
+
+        if ($totalPages < 1) {
+            $totalPages = 1;
+        }
+
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+
+        $users = $query
+            ->orderBy($sort, $direction)
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
+            ->get();
 
         View::render('users/index', [
             'users' => $users,
+            'search' => $search,
+            'role' => $role,
+            'sort' => $sort,
+            'direction' => $direction,
+            'page' => $page,
+            'perPage' => $perPage,
+            'total' => $total,
+            'totalPages' => $totalPages,
         ]);
     }
 
