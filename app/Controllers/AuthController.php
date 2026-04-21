@@ -8,6 +8,7 @@ use App\Core\View;
 use App\Models\User;
 use Respect\Validation\Validator as v;
 use App\Middleware\GuestMiddleware;
+use App\Services\AuditLogService;
 
 class AuthController
 {
@@ -55,6 +56,14 @@ class AuthController
             'email' => $user->email,
             'role'  => $user->role,
         ];
+
+        AuditLogService::log(
+            'auth.login',
+            (int) $user->id,
+            'user',
+            (int) $user->id,
+            'Usuário realizou login no sistema.'
+        );
 
         unset($_SESSION['_old']);
 
@@ -129,6 +138,18 @@ class AuthController
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {
             flash('error', 'Token CSRF inválido.');
             back();
+        }
+
+        $currentUser = auth();
+
+        if ($currentUser) {
+            AuditLogService::log(
+                'auth.logout',
+                (int) $currentUser['id'],
+                'user',
+                (int) $currentUser['id'],
+                'Usuário realizou logout do sistema.'
+            );
         }
 
         unset($_SESSION['auth']);

@@ -8,6 +8,7 @@ use App\Core\Mailer;
 use App\Core\View;
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Services\AuditLogService;
 use App\Middleware\GuestMiddleware;
 use Respect\Validation\Validator as v;
 
@@ -51,6 +52,14 @@ class PasswordResetController
 
         $token = bin2hex(random_bytes(32));
         $expiresAt = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+        AuditLogService::log(
+            'password.reset.requested',
+            (int) $user->id,
+            'user',
+            (int) $user->id,
+            'Usuário solicitou redefinição de senha.'
+        );
 
         PasswordReset::create([
             'email' => $email,
@@ -163,6 +172,14 @@ class PasswordResetController
         $user->update([
             'password' => password_hash($password, PASSWORD_DEFAULT),
         ]);
+
+        AuditLogService::log(
+            'password.reset.completed',
+            (int) $user->id,
+            'user',
+            (int) $user->id,
+            'Usuário redefiniu a própria senha.'
+        );
 
         $passwordReset->delete();
 

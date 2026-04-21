@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Middleware\AdminMiddleware;
 use App\Models\User;
+use App\Services\AuditLogService;
 use Respect\Validation\Validator as v;
 
 class UserController
@@ -126,12 +127,22 @@ class UserController
             back();
         }
 
-        User::create([
+        $newUser = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             'role' => $data['role'],
         ]);
+
+        $currentUser = auth();
+
+        AuditLogService::log(
+            'user.created',
+            (int) ($currentUser['id'] ?? 0),
+            'user',
+            (int) $newUser->id,
+            'Usuário criou um novo usuário: ' . $newUser->email
+        );
 
         unset($_SESSION['_old']);
 
@@ -218,6 +229,16 @@ class UserController
 
         $user->update($updateData);
 
+        $currentUser = auth();
+
+        AuditLogService::log(
+            'user.updated',
+            (int) ($currentUser['id'] ?? 0),
+            'user',
+            (int) $user->id,
+            'Usuário atualizou o usuário: ' . $user->email
+        );
+
         unset($_SESSION['_old']);
 
         flash('success', 'Usuário atualizado com sucesso.');
@@ -247,8 +268,20 @@ class UserController
             flash('error', 'Você não pode excluir seu próprio usuário.');
             redirect('/users');
         }
+        
+        $deletedUserId = (int) $user->id;
+        $deletedUserEmail = (string) $user->email;
+        $currentUser = auth();
 
         $user->delete();
+
+        AuditLogService::log(
+            'user.deleted',
+            (int) ($currentUser['id'] ?? 0),
+            'user',
+            $deletedUserId,
+            'Usuário excluiu o usuário: ' . $deletedUserEmail
+        );
 
         flash('success', 'Usuário excluído com sucesso.');
         redirect('/users');
