@@ -32,9 +32,67 @@ class ApiController
     {
         ApiAdminMiddleware::handle();
 
-        $users = User::query()
-            ->select(['id', 'name', 'email', 'role', 'created_at', 'updated_at'])
-            ->orderBy('id', 'desc')
+        $search = trim($_GET['search'] ?? '');
+        $role = trim($_GET['role'] ?? '');
+        $sort = trim($_GET['sort'] ?? 'created_at');
+        $direction = trim($_GET['direction'] ?? 'desc');
+        $page = (int) ($_GET['page'] ?? 1);
+        $perPage = (int) ($_GET['per_page'] ?? 10);
+
+        $allowedSorts = ['name', 'email', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+        $allowedRoles = ['admin', 'user'];
+        $allowedPerPage = [5, 10, 15, 20, 50];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
+        if ($role !== '' && !in_array($role, $allowedRoles, true)) {
+            $role = '';
+        }
+
+        if ($page < 1) {
+            $page = 1;
+        }
+
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 10;
+        }
+
+        $query = User::query()
+            ->select(['id', 'name', 'email', 'role', 'created_at', 'updated_at']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($role !== '') {
+            $query->where('role', $role);
+        }
+
+        $total = (clone $query)->count();
+        $totalPages = (int) ceil($total / $perPage);
+
+        if ($totalPages < 1) {
+            $totalPages = 1;
+        }
+
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+
+        $users = $query
+            ->orderBy($sort, $direction)
+            ->skip(($page - 1) * $perPage)
+            ->take($perPage)
             ->get()
             ->map(fn($user) => [
                 'id' => $user->id,
@@ -51,7 +109,18 @@ class ApiController
             'Usuários listados com sucesso.',
             $users,
             [
-                'total' => count($users),
+                'pagination' => [
+                    'page' => $page,
+                    'per_page' => $perPage,
+                    'total' => $total,
+                    'total_pages' => $totalPages,
+                ],
+                'filters' => [
+                    'search' => $search,
+                    'role' => $role,
+                    'sort' => $sort,
+                    'direction' => $direction,
+                ],
             ]
         );
     }
