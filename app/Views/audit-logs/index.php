@@ -127,9 +127,31 @@
                         <?php endif; ?>
                     </td>
                     <td>
-                        <?= $this->e((string) ($log->target_type ?? '-')) ?>
-                        <?php if (!empty($log->target_id)): ?>
-                            #<?= (int) $log->target_id ?>
+                        <?php
+                            $targetType = (string) ($log->target_type ?? '');
+                            $targetId = !empty($log->target_id) ? (int) $log->target_id : null;
+
+                            $targetLabels = [
+                                'user' => 'Usuário',
+                                'auth' => 'Autenticação',
+                                'password' => 'Senha',
+                                'session' => 'Sessão',
+                                'api' => 'API',
+                                'system' => 'Sistema',
+                                'audit_log' => 'Log',
+                            ];
+
+                            if ($targetType === '') {
+                                $targetLabel = 'Sistema';
+                            } else {
+                                $targetLabel = $targetLabels[$targetType] ?? ucfirst(str_replace('_', ' ', $targetType));
+                            }
+                        ?>
+
+                        <?= $this->e($targetLabel) ?>
+
+                        <?php if ($targetId !== null): ?>
+                            <span style="color: #475569;">#<?= $targetId ?></span>
                         <?php endif; ?>
                     </td>
                     <td><?= $this->e((string) ($log->description ?? '-')) ?></td>
