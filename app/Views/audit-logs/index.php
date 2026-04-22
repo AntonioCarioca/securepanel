@@ -117,7 +117,72 @@
             <?php foreach ($logs as $log): ?>
                 <tr>
                     <td><?= (int) $log->id ?></td>
-                    <td><?= $this->e($log->action) ?></td>
+                    <td>
+                        <?php
+                            $action = (string) $log->action;
+
+                            $actionStyles = [
+                                'auth.login' => [
+                                    'label' => 'Login',
+                                    'background' => '#dcfce7',
+                                    'color' => '#166534',
+                                ],
+                                'auth.logout' => [
+                                    'label' => 'Logout',
+                                    'background' => '#e5e7eb',
+                                    'color' => '#374151',
+                                ],
+                                'password.reset.requested' => [
+                                    'label' => 'Reset solicitado',
+                                    'background' => '#ede9fe',
+                                    'color' => '#6d28d9',
+                                ],
+                                'password.reset.completed' => [
+                                    'label' => 'Reset concluído',
+                                    'background' => '#ddd6fe',
+                                    'color' => '#5b21b6',
+                                ],
+                                'user.created' => [
+                                    'label' => 'Usuário criado',
+                                    'background' => '#dbeafe',
+                                    'color' => '#1d4ed8',
+                                ],
+                                'user.updated' => [
+                                    'label' => 'Usuário atualizado',
+                                    'background' => '#fef3c7',
+                                    'color' => '#92400e',
+                                ],
+                                'user.deleted' => [
+                                    'label' => 'Usuário excluído',
+                                    'background' => '#fee2e2',
+                                    'color' => '#b91c1c',
+                                ],
+                            ];
+
+                            $style = $actionStyles[$action] ?? [
+                                'label' => $action,
+                                'background' => '#e2e8f0',
+                                'color' => '#334155',
+                            ];
+                        ?>
+
+                        <span style="
+                            display: inline-block;
+                            padding: 4px 10px;
+                            border-radius: 999px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            background: <?= $this->e($style['background']) ?>;
+                            color: <?= $this->e($style['color']) ?>;
+                            white-space: nowrap;
+                        ">
+                            <?= $this->e($style['label']) ?>
+                        </span>
+
+                        <div style="margin-top: 4px; font-size: 12px; color: #64748b;">
+                            <?= $this->e($action) ?>
+                        </div>
+                    </td>
                     <td>
                         <?php if ($log->user): ?>
                             <?= $this->e($log->user->name) ?><br>
