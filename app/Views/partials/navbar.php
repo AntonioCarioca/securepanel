@@ -3,6 +3,7 @@
 
     <?php if (($authUser['role'] ?? 'user') === 'admin'): ?>
         | <a href="/users">Usuários</a>
+        | <a href="/audit-logs">Audit Logs</a>
     <?php endif; ?>
 
     | <form action="/logout" method="POST" style="display:inline;">

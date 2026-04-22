@@ -15,6 +15,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\PasswordResetController;
 use App\Controllers\UserController;
+use App\Controllers\AuditLogController;
 
 return [
     // Autenticação
@@ -27,6 +28,7 @@ return [
     // Home / Dashboard
     ['GET', '/', [DashboardController::class, 'home']],
     ['GET', '/dashboard', [DashboardController::class, 'index']],
+    ['GET', '/audit-logs', [AuditLogController::class, 'index']],
     
     // Recuperação de senha
     ['GET', '/forgot-password', [PasswordResetController::class, 'showForgotPassword']],
