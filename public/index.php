@@ -30,6 +30,17 @@ $uri = rawurldecode($uri);
 
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
+$rawBody = file_get_contents('php://input');
+$GLOBALS['json_input'] = [];
+
+if ($rawBody !== false && $rawBody !== '') {
+    $decoded = json_decode($rawBody, true);
+
+    if (is_array($decoded)) {
+        $GLOBALS['json_input'] = $decoded;
+    }
+}
+
 switch ($routeInfo[0]) {
     case Dispatcher::NOT_FOUND:
         http_response_code(404);
