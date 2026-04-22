@@ -28,7 +28,10 @@ return [
     // Home / Dashboard
     ['GET', '/', [DashboardController::class, 'home']],
     ['GET', '/dashboard', [DashboardController::class, 'index']],
+
+    // Logs
     ['GET', '/audit-logs', [AuditLogController::class, 'index']],
+    ['GET', '/audit-logs/export', [AuditLogController::class, 'exportCsv']],
     
     // Recuperação de senha
     ['GET', '/forgot-password', [PasswordResetController::class, 'showForgotPassword']],

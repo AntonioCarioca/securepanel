@@ -52,7 +52,47 @@
 
     <button type="submit">Aplicar</button>
     <a href="/audit-logs" style="margin-left: 10px;">Limpar filtros</a>
+    <input type="hidden" name="sort" value="<?= $this->e((string) ($sort ?? 'created_at')) ?>">
+    <input type="hidden" name="direction" value="<?= $this->e((string) ($direction ?? 'desc')) ?>">
 </form>
+
+<?php
+    $exportQuery = [];
+
+    if (!empty($search)) {
+        $exportQuery['search'] = $search;
+    }
+
+    if (!empty($action)) {
+        $exportQuery['action'] = $action;
+    }
+
+    if (!empty($dateFrom)) {
+        $exportQuery['date_from'] = $dateFrom;
+    }
+
+    if (!empty($dateTo)) {
+        $exportQuery['date_to'] = $dateTo;
+    }
+
+    if (!empty($sort)) {
+        $exportQuery['sort'] = $sort;
+    }
+
+    if (!empty($direction)) {
+        $exportQuery['direction'] = $direction;
+    }
+
+    $exportUrl = '/audit-logs/export';
+
+    if (!empty($exportQuery)) {
+        $exportUrl .= '?' . http_build_query($exportQuery);
+    }
+?>
+
+<p style="margin-bottom: 16px;">
+    <a href="<?= $this->e($exportUrl) ?>">Exportar CSV</a>
+</p>
 
 <?php
     $activeFilters = [];
@@ -102,15 +142,75 @@
 
 <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse;">
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Ação</th>
-            <th>Usuário</th>
-            <th>Alvo</th>
-            <th>Descrição</th>
-            <th>IP</th>
-            <th>Data</th>
-        </tr>
+    <?php
+        $buildSortUrl = function (string $column) use ($search, $action, $dateFrom, $dateTo, $sort, $direction): string {
+            $newDirection = 'asc';
+
+            if ($sort === $column) {
+                $newDirection = $direction === 'asc' ? 'desc' : 'asc';
+            }
+
+            $query = [
+                'sort' => $column,
+                'direction' => $newDirection,
+                'page' => 1,
+            ];
+
+            if (!empty($search)) {
+                $query['search'] = $search;
+            }
+
+            if (!empty($action)) {
+                $query['action'] = $action;
+            }
+
+            if (!empty($dateFrom)) {
+                $query['date_from'] = $dateFrom;
+            }
+
+            if (!empty($dateTo)) {
+                $query['date_to'] = $dateTo;
+            }
+
+            return '/audit-logs?' . http_build_query($query);
+        };
+
+        $indicator = function (string $column) use ($sort, $direction): string {
+            if ($sort !== $column) return '';
+            return $direction === 'asc' ? ' ↑' : ' ↓';
+        };
+    ?>
+    <tr>
+        <th>
+            <a href="<?= $this->e($buildSortUrl('id')) ?>">
+                ID<?= $this->e($indicator('id')) ?>
+            </a>
+        </th>
+
+        <th>
+            <a href="<?= $this->e($buildSortUrl('action')) ?>">
+                Ação<?= $this->e($indicator('action')) ?>
+            </a>
+        </th>
+
+        <th>Usuário</th>
+
+        <th>Alvo</th>
+
+        <th>Descrição</th>
+
+        <th>
+            <a href="<?= $this->e($buildSortUrl('ip_address')) ?>">
+                IP<?= $this->e($indicator('ip_address')) ?>
+            </a>
+        </th>
+
+        <th>
+            <a href="<?= $this->e($buildSortUrl('created_at')) ?>">
+                Data<?= $this->e($indicator('created_at')) ?>
+            </a>
+        </th>
+    </tr>
     </thead>
     <tbody>
         <?php if (count($logs) > 0): ?>
@@ -238,24 +338,17 @@
             $currentPage = (int) ($page ?? 1);
             $pages = (int) ($totalPages ?? 1);
 
-            $buildPageUrl = function (int $targetPage) use ($search, $action, $dateFrom, $dateTo): string {
-                $query = ['page' => $targetPage];
+            $buildPageUrl = function (int $targetPage) use ($search, $action, $dateFrom, $dateTo, $sort, $direction): string {
+                $query = [
+                    'page' => $targetPage,
+                    'sort' => $sort,
+                    'direction' => $direction,
+                ];
 
-                if (!empty($search)) {
-                    $query['search'] = $search;
-                }
-
-                if (!empty($action)) {
-                    $query['action'] = $action;
-                }
-
-                if (!empty($dateFrom)) {
-                    $query['date_from'] = $dateFrom;
-                }
-
-                if (!empty($dateTo)) {
-                    $query['date_to'] = $dateTo;
-                }
+                if (!empty($search)) $query['search'] = $search;
+                if (!empty($action)) $query['action'] = $action;
+                if (!empty($dateFrom)) $query['date_from'] = $dateFrom;
+                if (!empty($dateTo)) $query['date_to'] = $dateTo;
 
                 return '/audit-logs?' . http_build_query($query);
             };
