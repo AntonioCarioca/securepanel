@@ -24,7 +24,7 @@ class DashboardController
         }
 
         View::render('dashboard/index', [
-            'user' => auth(),
+            'dashboardUser' => dashboard_user_data(auth()),
         ]);
     }
 }

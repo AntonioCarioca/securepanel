@@ -7,12 +7,12 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Middleware\AdminMiddleware;
 use App\Models\User;
+use App\Presenters\UserPresenter;
 use App\Services\AuditLogService;
 use Respect\Validation\Validator as v;
 
 class UserController
 {
-    
     public function index(array $params = []): void
     {
         AdminMiddleware::handle();
@@ -72,7 +72,23 @@ class UserController
             ->orderBy($sort, $direction)
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
-            ->get();
+            ->get()
+            ->map(fn(User $user) => new UserPresenter($user))
+            ->all();
+
+        $baseQuery = [
+            'search' => $search,
+            'role' => $role,
+            'sort' => $sort,
+            'direction' => $direction,
+        ];
+
+        $filterQuery = [
+            'search' => $search,
+            'role' => $role,
+            'sort' => $sort,
+            'direction' => $direction,
+        ];
 
         View::render('users/index', [
             'users' => $users,
@@ -84,6 +100,19 @@ class UserController
             'perPage' => $perPage,
             'total' => $total,
             'totalPages' => $totalPages,
+            'activeFilters' => user_active_filters($search, $role, $sort, $direction),
+            'exportUrl' => build_url('/users/export', $baseQuery),
+            'pagination' => pagination_view_data('/users', $page, $totalPages, $baseQuery),
+            'sortUrls' => [
+                'name' => sort_url('/users', 'name', $sort, $direction, $filterQuery),
+                'email' => sort_url('/users', 'email', $sort, $direction, $filterQuery),
+                'created_at' => sort_url('/users', 'created_at', $sort, $direction, $filterQuery),
+            ],
+            'sortIndicators' => [
+                'name' => sort_indicator('name', $sort, $direction),
+                'email' => sort_indicator('email', $sort, $direction),
+                'created_at' => sort_indicator('created_at', $sort, $direction),
+            ],
         ]);
     }
 
@@ -91,7 +120,9 @@ class UserController
     {
         AdminMiddleware::handle();
 
-        View::render('users/create');
+        View::render('users/create', [
+            'form' => user_form_data(),
+        ]);
     }
 
     public function store(): void
@@ -163,7 +194,7 @@ class UserController
         }
 
         View::render('users/edit', [
-            'editUser' => $user,
+            'form' => user_form_data($user),
         ]);
     }
 
@@ -268,10 +299,9 @@ class UserController
             flash('error', 'Você não pode excluir seu próprio usuário.');
             redirect('/users');
         }
-        
+
         $deletedUserId = (int) $user->id;
         $deletedUserEmail = (string) $user->email;
-        $currentUser = auth();
 
         $user->delete();
 
@@ -346,9 +376,7 @@ class UserController
             exit;
         }
 
-        // BOM para melhor compatibilidade com Excel
         fwrite($output, "\xEF\xBB\xBF");
-
         fputcsv($output, ['ID', 'Nome', 'E-mail', 'Perfil', 'Criado em'], ';', '"', '\\');
 
         foreach ($users as $user) {
@@ -357,7 +385,7 @@ class UserController
                 $user->name,
                 $user->email,
                 $user->role,
-                date('d/m/Y H:i', strtotime((string) $user->created_at)),
+                format_datetime($user->created_at),
             ], ';', '"', '\\');
         }
 

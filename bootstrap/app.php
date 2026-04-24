@@ -5,19 +5,17 @@ declare(strict_types=1);
 /**
  * BOOTSTRAP DA APLICAÇÃO
  *
- * Este arquivo é responsável por preparar o ambiente da aplicação.
- * Ele NÃO executa lógica de negócio.
- *
  * Responsabilidades:
  * - Carregar autoload do Composer
+ * - Carregar helpers globais
  * - Iniciar sessão
  * - Carregar variáveis de ambiente (.env)
  * - Configurar banco de dados (Eloquent)
  * - Definir timezone
- * - Disponibilizar helpers globais
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/Helpers/view.php';
 
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -28,14 +26,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $rootPath = dirname(__DIR__);
 
-// Carrega .env
 $dotenv = Dotenv::createImmutable($rootPath);
 $dotenv->safeLoad();
 
-// Configura timezone
 date_default_timezone_set('America/Manaus');
 
-// Configura Eloquent ORM
 $capsule = new Capsule();
 
 $capsule->addConnection([
@@ -50,12 +45,9 @@ $capsule->addConnection([
     'prefix'    => '',
 ]);
 
-// Torna o Capsule disponível globalmente através de métodos estáticos
 $capsule->setAsGlobal();
-// Inicializa o Eloquent
 $capsule->bootEloquent();
 
-// Funções helper simples
 function config(string $key, mixed $default = null): mixed
 {
     return $_ENV[$key] ?? $default;
@@ -113,9 +105,4 @@ function csrf_token(): string
 function verify_csrf_token(?string $token): bool
 {
     return isset($_SESSION['_csrf']) && is_string($token) && hash_equals($_SESSION['_csrf'], $token);
-}
-
-function formatDate(string $date): string
-{
-    return date('d/m/Y H:i', strtotime($date));
 }

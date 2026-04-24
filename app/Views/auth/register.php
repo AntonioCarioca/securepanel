@@ -1,19 +1,20 @@
 <?php $this->insert('layouts/header', ['title' => 'Cadastro', 'authUser' => $authUser ?? null]) ?>
+
 <h1>Cadastro</h1>
 
 <form action="/register" method="POST">
-    <input type="hidden" name="_csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
+    <?php $this->insert('components/csrf') ?>
 
     <div>
         <label for="name">Nome</label><br>
-        <input id="name" type="text" name="name" value="<?= htmlspecialchars((string) old('name')) ?>" required>
+        <input id="name" type="text" name="name" value="<?= $this->e(old_value('name')) ?>" required>
     </div>
 
     <br>
 
     <div>
         <label for="email">E-mail</label><br>
-        <input id="email" type="email" name="email" value="<?= htmlspecialchars((string) old('email')) ?>" required>
+        <input id="email" type="email" name="email" value="<?= $this->e(old_value('email')) ?>" required>
     </div>
 
     <br>
@@ -36,4 +37,5 @@
 </form>
 
 <p><a href="/login">Voltar para login</a></p>
+
 <?php $this->insert('layouts/footer') ?>

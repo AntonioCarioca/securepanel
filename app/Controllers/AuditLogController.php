@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\View;
 use App\Middleware\AdminMiddleware;
 use App\Models\AuditLog;
+use App\Presenters\AuditLogPresenter;
 
 class AuditLogController
 {
@@ -27,6 +28,17 @@ class AuditLogController
             $page = 1;
         }
 
+        $allowedSorts = ['id', 'action', 'ip_address', 'created_at'];
+        $allowedDirections = ['asc', 'desc'];
+
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
+
+        if (!in_array($direction, $allowedDirections, true)) {
+            $direction = 'desc';
+        }
+
         $query = AuditLog::query()->with('user');
 
         if ($search !== '') {
@@ -38,17 +50,6 @@ class AuditLogController
                                 ->orWhere('name', 'like', '%' . $search . '%');
                   });
             });
-        }
-
-        $allowedSorts = ['id', 'action', 'ip_address', 'created_at'];
-        $allowedDirections = ['asc', 'desc'];
-
-        if (!in_array($sort, $allowedSorts, true)) {
-            $sort = 'created_at';
-        }
-
-        if (!in_array($direction, $allowedDirections, true)) {
-            $direction = 'desc';
         }
 
         if ($action !== '') {
@@ -78,7 +79,9 @@ class AuditLogController
             ->orderBy($sort, $direction)
             ->skip(($page - 1) * $perPage)
             ->take($perPage)
-            ->get();
+            ->get()
+            ->map(fn(AuditLog $log) => new AuditLogPresenter($log))
+            ->all();
 
         $actions = AuditLog::query()
             ->select('action')
@@ -86,6 +89,15 @@ class AuditLogController
             ->orderBy('action')
             ->pluck('action')
             ->toArray();
+
+        $baseQuery = [
+            'search' => $search,
+            'action' => $action,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'sort' => $sort,
+            'direction' => $direction,
+        ];
 
         View::render('audit-logs/index', [
             'logs' => $logs,
@@ -99,6 +111,21 @@ class AuditLogController
             'totalPages' => $totalPages,
             'sort' => $sort,
             'direction' => $direction,
+            'activeFilters' => audit_active_filters($search, $action, $dateFrom, $dateTo),
+            'exportUrl' => build_url('/audit-logs/export', $baseQuery),
+            'pagination' => pagination_view_data('/audit-logs', $page, $totalPages, $baseQuery),
+            'sortUrls' => [
+                'id' => sort_url('/audit-logs', 'id', $sort, $direction, $baseQuery),
+                'action' => sort_url('/audit-logs', 'action', $sort, $direction, $baseQuery),
+                'ip_address' => sort_url('/audit-logs', 'ip_address', $sort, $direction, $baseQuery),
+                'created_at' => sort_url('/audit-logs', 'created_at', $sort, $direction, $baseQuery),
+            ],
+            'sortIndicators' => [
+                'id' => sort_indicator('id', $sort, $direction),
+                'action' => sort_indicator('action', $sort, $direction),
+                'ip_address' => sort_indicator('ip_address', $sort, $direction),
+                'created_at' => sort_indicator('created_at', $sort, $direction),
+            ],
         ]);
     }
 
@@ -181,43 +208,20 @@ class AuditLogController
         );
 
         foreach ($logs as $log) {
-            $userName = $log->user?->name ?? 'Usuário removido / não encontrado';
-            $userEmail = $log->user?->email ?? '-';
-
-            $targetType = (string) ($log->target_type ?? '');
-            $targetId = !empty($log->target_id) ? (int) $log->target_id : null;
-
-            $targetLabels = [
-                'user' => 'Usuário',
-                'auth' => 'Autenticação',
-                'password' => 'Senha',
-                'session' => 'Sessão',
-                'api' => 'API',
-                'system' => 'Sistema',
-                'audit_log' => 'Log',
-            ];
-
-            if ($targetType === '') {
-                $targetLabel = 'Sistema';
-            } else {
-                $targetLabel = $targetLabels[$targetType] ?? ucfirst(str_replace('_', ' ', $targetType));
-            }
-
-            if ($targetId !== null) {
-                $targetLabel .= ' #' . $targetId;
-            }
-
             fputcsv(
                 $output,
                 [
                     $log->id,
                     $log->action,
-                    $userName,
-                    $userEmail,
-                    $targetLabel,
+                    $log->user?->name ?? 'Usuário removido / não encontrado',
+                    $log->user?->email ?? '-',
+                    audit_target_label(
+                        $log->target_type,
+                        !empty($log->target_id) ? (int) $log->target_id : null
+                    ),
                     (string) ($log->description ?? '-'),
                     (string) ($log->ip_address ?? '-'),
-                    date('d/m/Y H:i', strtotime((string) $log->created_at)),
+                    format_datetime($log->created_at),
                 ],
                 ';',
                 '"',

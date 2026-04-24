@@ -1,8 +1,9 @@
 <?php $this->insert('layouts/header', ['title' => 'Esqueci minha senha', 'authUser' => $authUser ?? null]) ?>
+
 <h1>Esqueci minha senha</h1>
 
 <form action="/forgot-password" method="POST">
-    <input type="hidden" name="_csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
+    <?php $this->insert('components/csrf') ?>
 
     <div>
         <label for="email">E-mail</label><br>
@@ -10,7 +11,7 @@
             id="email"
             type="email"
             name="email"
-            value="<?= htmlspecialchars((string) old('email')) ?>"
+            value="<?= $this->e(old_value('email')) ?>"
             required
         >
     </div>
@@ -21,4 +22,5 @@
 </form>
 
 <p><a href="/login">Voltar para login</a></p>
+
 <?php $this->insert('layouts/footer') ?>

@@ -1,9 +1,10 @@
 <?php $this->insert('layouts/header', ['title' => 'Redefinir senha', 'authUser' => $authUser ?? null]) ?>
+
 <h1>Redefinir senha</h1>
 
 <form action="/reset-password" method="POST">
-    <input type="hidden" name="_csrf" value="<?= htmlspecialchars(csrf_token()) ?>">
-    <input type="hidden" name="token" value="<?= htmlspecialchars($token ?? '') ?>">
+    <?php $this->insert('components/csrf') ?>
+    <input type="hidden" name="token" value="<?= $this->e((string) ($token ?? '')) ?>">
 
     <div>
         <label for="password">Nova senha</label><br>
@@ -23,4 +24,5 @@
 </form>
 
 <p><a href="/login">Voltar para login</a></p>
+
 <?php $this->insert('layouts/footer') ?>

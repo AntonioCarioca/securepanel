@@ -3,7 +3,7 @@
 <h1>Login</h1>
 
 <form action="/login" method="POST">
-    <input type="hidden" name="_csrf" value="<?= $this->e(csrf_token()) ?>">
+    <?php $this->insert('components/csrf') ?>
 
     <div>
         <label for="email">E-mail</label><br>
@@ -11,7 +11,7 @@
             id="email"
             type="email"
             name="email"
-            value="<?= $this->e((string) old('email')) ?>"
+            value="<?= $this->e(old_value('email')) ?>"
             required
         >
     </div>

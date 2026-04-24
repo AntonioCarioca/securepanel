@@ -6,11 +6,13 @@
     <title><?= $this->e($title ?? 'Auth System') ?></title>
 </head>
 <body>
-    <?php $this->insert('partials/navbar', ['authUser' => $authUser ?? null]) ?>
+    <?php if (!empty($authUser)): ?>
+        <?php $this->insert('partials/navbar', ['authUser' => $authUser]) ?>
+    <?php endif; ?>
 
     <main>
         <?php $this->insert('partials/alerts') ?>
-        <?= $this->section('contentt') ?>
+        <?= $this->section('content') ?>
     </main>
 </body>
 </html>

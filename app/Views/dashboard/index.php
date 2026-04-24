@@ -2,16 +2,16 @@
 
 <h1>Dashboard</h1>
 
-<p>Bem-vindo, <?= $this->e($user['name'] ?? 'Usuário') ?>.</p>
-<p>E-mail: <?= $this->e($user['email'] ?? '') ?></p>
-<p>Perfil: <?= $this->e($user['role'] ?? 'user') ?></p>
+<p>Bem-vindo, <?= $this->e($dashboardUser['name']) ?>.</p>
+<p>E-mail: <?= $this->e($dashboardUser['email']) ?></p>
+<p>Perfil: <?= $this->e($dashboardUser['role']) ?></p>
 
-<?php if (($user['role'] ?? 'user') === 'admin'): ?>
+<?php if ($dashboardUser['isAdmin']): ?>
     <p><a href="/users">Gerenciar usuários</a></p>
 <?php endif; ?>
 
 <form action="/logout" method="POST">
-    <input type="hidden" name="_csrf" value="<?= $this->e(csrf_token()) ?>">
+    <?php $this->insert('components/csrf') ?>
     <button type="submit">Sair</button>
 </form>
 

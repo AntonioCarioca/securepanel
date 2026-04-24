@@ -2,9 +2,7 @@
 
 <h1>Audit Logs</h1>
 
-<p>
-    <a href="/dashboard">Voltar ao dashboard</a>
-</p>
+<p><a href="/dashboard">Voltar ao dashboard</a></p>
 
 <form action="/audit-logs" method="GET" style="margin-bottom: 20px;">
     <div style="margin-bottom: 12px;">
@@ -23,7 +21,7 @@
         <select id="action" name="action">
             <option value="">Todas</option>
             <?php foreach (($actions ?? []) as $item): ?>
-                <option value="<?= $this->e($item) ?>" <?= ($action ?? '') === $item ? 'selected' : '' ?>>
+                <option value="<?= $this->e($item) ?>" <?= selected_attr($action ?? '', $item) ?>>
                     <?= $this->e($item) ?>
                 </option>
             <?php endforeach; ?>
@@ -32,299 +30,63 @@
 
     <div style="margin-bottom: 12px;">
         <label for="date_from">Data inicial</label><br>
-        <input
-            id="date_from"
-            type="date"
-            name="date_from"
-            value="<?= $this->e((string) ($dateFrom ?? '')) ?>"
-        >
+        <input id="date_from" type="date" name="date_from" value="<?= $this->e((string) ($dateFrom ?? '')) ?>">
     </div>
 
     <div style="margin-bottom: 12px;">
         <label for="date_to">Data final</label><br>
-        <input
-            id="date_to"
-            type="date"
-            name="date_to"
-            value="<?= $this->e((string) ($dateTo ?? '')) ?>"
-        >
+        <input id="date_to" type="date" name="date_to" value="<?= $this->e((string) ($dateTo ?? '')) ?>">
     </div>
+
+    <input type="hidden" name="sort" value="<?= $this->e((string) ($sort ?? 'created_at')) ?>">
+    <input type="hidden" name="direction" value="<?= $this->e((string) ($direction ?? 'desc')) ?>">
 
     <button type="submit">Aplicar</button>
     <a href="/audit-logs" style="margin-left: 10px;">Limpar filtros</a>
-    <input type="hidden" name="sort" value="<?= $this->e((string) ($sort ?? 'created_at')) ?>">
-    <input type="hidden" name="direction" value="<?= $this->e((string) ($direction ?? 'desc')) ?>">
 </form>
 
-<?php
-    $exportQuery = [];
-
-    if (!empty($search)) {
-        $exportQuery['search'] = $search;
-    }
-
-    if (!empty($action)) {
-        $exportQuery['action'] = $action;
-    }
-
-    if (!empty($dateFrom)) {
-        $exportQuery['date_from'] = $dateFrom;
-    }
-
-    if (!empty($dateTo)) {
-        $exportQuery['date_to'] = $dateTo;
-    }
-
-    if (!empty($sort)) {
-        $exportQuery['sort'] = $sort;
-    }
-
-    if (!empty($direction)) {
-        $exportQuery['direction'] = $direction;
-    }
-
-    $exportUrl = '/audit-logs/export';
-
-    if (!empty($exportQuery)) {
-        $exportUrl .= '?' . http_build_query($exportQuery);
-    }
-?>
-
 <p style="margin-bottom: 16px;">
-    <a href="<?= $this->e($exportUrl) ?>">Exportar CSV</a>
+    <a href="<?= $this->e($exportUrl ?? '/audit-logs/export') ?>">Exportar CSV</a>
 </p>
 
-<?php
-    $activeFilters = [];
-
-    if (!empty($search)) {
-        $activeFilters[] = 'Busca: "' . $this->e($search) . '"';
-    }
-
-    if (!empty($action)) {
-        $activeFilters[] = 'Ação: ' . $this->e($action);
-    }
-
-    if (!empty($dateFrom)) {
-        $activeFilters[] = 'De: ' . $this->e(date('d/m/Y', strtotime($dateFrom)));
-    }
-
-    if (!empty($dateTo)) {
-        $activeFilters[] = 'Até: ' . $this->e(date('d/m/Y', strtotime($dateTo)));
-    }
-?>
-
-<?php if (!empty($activeFilters)): ?>
-    <div style="margin-bottom: 16px;">
-        <strong>Filtros ativos:</strong>
-
-        <div style="margin-top: 8px;">
-            <?php foreach ($activeFilters as $filter): ?>
-                <span style="
-                    display: inline-block;
-                    background: #f1f5f9;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 999px;
-                    padding: 6px 10px;
-                    margin: 4px 6px 4px 0;
-                    font-size: 14px;
-                ">
-                    <?= $filter ?>
-                </span>
-            <?php endforeach; ?>
-
-            <a href="/audit-logs" style="margin-left: 8px;">Limpar todos</a>
-        </div>
-    </div>
-<?php endif; ?>
+<?php $this->insert('components/active-filters', ['filters' => $activeFilters ?? [], 'clearUrl' => '/audit-logs']) ?>
 
 <p>Total de registros: <?= (int) ($total ?? 0) ?></p>
 
 <table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse;">
     <thead>
-    <?php
-        $buildSortUrl = function (string $column) use ($search, $action, $dateFrom, $dateTo, $sort, $direction): string {
-            $newDirection = 'asc';
-
-            if ($sort === $column) {
-                $newDirection = $direction === 'asc' ? 'desc' : 'asc';
-            }
-
-            $query = [
-                'sort' => $column,
-                'direction' => $newDirection,
-                'page' => 1,
-            ];
-
-            if (!empty($search)) {
-                $query['search'] = $search;
-            }
-
-            if (!empty($action)) {
-                $query['action'] = $action;
-            }
-
-            if (!empty($dateFrom)) {
-                $query['date_from'] = $dateFrom;
-            }
-
-            if (!empty($dateTo)) {
-                $query['date_to'] = $dateTo;
-            }
-
-            return '/audit-logs?' . http_build_query($query);
-        };
-
-        $indicator = function (string $column) use ($sort, $direction): string {
-            if ($sort !== $column) return '';
-            return $direction === 'asc' ? ' ↑' : ' ↓';
-        };
-    ?>
-    <tr>
-        <th>
-            <a href="<?= $this->e($buildSortUrl('id')) ?>">
-                ID<?= $this->e($indicator('id')) ?>
-            </a>
-        </th>
-
-        <th>
-            <a href="<?= $this->e($buildSortUrl('action')) ?>">
-                Ação<?= $this->e($indicator('action')) ?>
-            </a>
-        </th>
-
-        <th>Usuário</th>
-
-        <th>Alvo</th>
-
-        <th>Descrição</th>
-
-        <th>
-            <a href="<?= $this->e($buildSortUrl('ip_address')) ?>">
-                IP<?= $this->e($indicator('ip_address')) ?>
-            </a>
-        </th>
-
-        <th>
-            <a href="<?= $this->e($buildSortUrl('created_at')) ?>">
-                Data<?= $this->e($indicator('created_at')) ?>
-            </a>
-        </th>
-    </tr>
+        <tr>
+            <th><a href="<?= $this->e($sortUrls['id'] ?? '/audit-logs') ?>">ID<?= $this->e($sortIndicators['id'] ?? '') ?></a></th>
+            <th><a href="<?= $this->e($sortUrls['action'] ?? '/audit-logs') ?>">Ação<?= $this->e($sortIndicators['action'] ?? '') ?></a></th>
+            <th>Usuário</th>
+            <th>Alvo</th>
+            <th>Descrição</th>
+            <th><a href="<?= $this->e($sortUrls['ip_address'] ?? '/audit-logs') ?>">IP<?= $this->e($sortIndicators['ip_address'] ?? '') ?></a></th>
+            <th><a href="<?= $this->e($sortUrls['created_at'] ?? '/audit-logs') ?>">Data<?= $this->e($sortIndicators['created_at'] ?? '') ?></a></th>
+        </tr>
     </thead>
     <tbody>
-        <?php if (count($logs) > 0): ?>
-            <?php foreach ($logs as $log): ?>
-                <tr>
-                    <td><?= (int) $log->id ?></td>
-                    <td>
-                        <?php
-                            $action = (string) $log->action;
+        <?php foreach ($logs as $log): ?>
+            <tr>
+                <td><?= $log->id() ?></td>
+                <td>
+                    <?php $this->insert('components/action-badge', ['badge' => $log->actionBadge()]) ?>
+                    <div style="margin-top: 4px; font-size: 12px; color: #64748b;">
+                        <?= $this->e($log->action()) ?>
+                    </div>
+                </td>
+                <td>
+                    <?= $this->e($log->userName()) ?><br>
+                    <small><?= $this->e($log->userEmail()) ?></small>
+                </td>
+                <td><?= $this->e($log->targetLabel()) ?></td>
+                <td><?= $this->e($log->description()) ?></td>
+                <td><?= $this->e($log->ipAddress()) ?></td>
+                <td><?= $this->e($log->createdAt()) ?></td>
+            </tr>
+        <?php endforeach; ?>
 
-                            $actionStyles = [
-                                'auth.login' => [
-                                    'label' => 'Login',
-                                    'background' => '#dcfce7',
-                                    'color' => '#166534',
-                                ],
-                                'auth.logout' => [
-                                    'label' => 'Logout',
-                                    'background' => '#e5e7eb',
-                                    'color' => '#374151',
-                                ],
-                                'password.reset.requested' => [
-                                    'label' => 'Reset solicitado',
-                                    'background' => '#ede9fe',
-                                    'color' => '#6d28d9',
-                                ],
-                                'password.reset.completed' => [
-                                    'label' => 'Reset concluído',
-                                    'background' => '#ddd6fe',
-                                    'color' => '#5b21b6',
-                                ],
-                                'user.created' => [
-                                    'label' => 'Usuário criado',
-                                    'background' => '#dbeafe',
-                                    'color' => '#1d4ed8',
-                                ],
-                                'user.updated' => [
-                                    'label' => 'Usuário atualizado',
-                                    'background' => '#fef3c7',
-                                    'color' => '#92400e',
-                                ],
-                                'user.deleted' => [
-                                    'label' => 'Usuário excluído',
-                                    'background' => '#fee2e2',
-                                    'color' => '#b91c1c',
-                                ],
-                            ];
-
-                            $style = $actionStyles[$action] ?? [
-                                'label' => $action,
-                                'background' => '#e2e8f0',
-                                'color' => '#334155',
-                            ];
-                        ?>
-
-                        <span style="
-                            display: inline-block;
-                            padding: 4px 10px;
-                            border-radius: 999px;
-                            font-size: 12px;
-                            font-weight: 600;
-                            background: <?= $this->e($style['background']) ?>;
-                            color: <?= $this->e($style['color']) ?>;
-                            white-space: nowrap;
-                        ">
-                            <?= $this->e($style['label']) ?>
-                        </span>
-
-                        <div style="margin-top: 4px; font-size: 12px; color: #64748b;">
-                            <?= $this->e($action) ?>
-                        </div>
-                    </td>
-                    <td>
-                        <?php if ($log->user): ?>
-                            <?= $this->e($log->user->name) ?><br>
-                            <small><?= $this->e($log->user->email) ?></small>
-                        <?php else: ?>
-                            <em>Usuário removido / não encontrado</em>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <?php
-                            $targetType = (string) ($log->target_type ?? '');
-                            $targetId = !empty($log->target_id) ? (int) $log->target_id : null;
-
-                            $targetLabels = [
-                                'user' => 'Usuário',
-                                'auth' => 'Autenticação',
-                                'password' => 'Senha',
-                                'session' => 'Sessão',
-                                'api' => 'API',
-                                'system' => 'Sistema',
-                                'audit_log' => 'Log',
-                            ];
-
-                            if ($targetType === '') {
-                                $targetLabel = 'Sistema';
-                            } else {
-                                $targetLabel = $targetLabels[$targetType] ?? ucfirst(str_replace('_', ' ', $targetType));
-                            }
-                        ?>
-
-                        <?= $this->e($targetLabel) ?>
-
-                        <?php if ($targetId !== null): ?>
-                            <span style="color: #475569;">#<?= $targetId ?></span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= $this->e((string) ($log->description ?? '-')) ?></td>
-                    <td><?= $this->e((string) ($log->ip_address ?? '-')) ?></td>
-                    <td><?= $this->e(date('d/m/Y H:i', strtotime((string) $log->created_at))) ?></td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
+        <?php if (count($logs) === 0): ?>
             <tr>
                 <td colspan="7">Nenhum log encontrado.</td>
             </tr>
@@ -332,77 +94,6 @@
     </tbody>
 </table>
 
-<?php if (($totalPages ?? 1) > 1): ?>
-    <nav style="margin-top: 20px;">
-        <?php
-            $currentPage = (int) ($page ?? 1);
-            $pages = (int) ($totalPages ?? 1);
-
-            $buildPageUrl = function (int $targetPage) use ($search, $action, $dateFrom, $dateTo, $sort, $direction): string {
-                $query = [
-                    'page' => $targetPage,
-                    'sort' => $sort,
-                    'direction' => $direction,
-                ];
-
-                if (!empty($search)) $query['search'] = $search;
-                if (!empty($action)) $query['action'] = $action;
-                if (!empty($dateFrom)) $query['date_from'] = $dateFrom;
-                if (!empty($dateTo)) $query['date_to'] = $dateTo;
-
-                return '/audit-logs?' . http_build_query($query);
-            };
-            
-            $visiblePages = [];
-
-            if ($pages <= 7) {
-                for ($i = 1; $i <= $pages; $i++) {
-                    $visiblePages[] = $i;
-                }
-            } else {
-                $visiblePages[] = 1;
-
-                if ($currentPage <= 4) {
-                    for ($i = 2; $i <= 5; $i++) {
-                        $visiblePages[] = $i;
-                    }
-                    $visiblePages[] = '...';
-                    $visiblePages[] = $pages;
-                } elseif ($currentPage >= $pages - 3) {
-                    $visiblePages[] = '...';
-                    for ($i = $pages - 4; $i < $pages; $i++) {
-                        $visiblePages[] = $i;
-                    }
-                    $visiblePages[] = $pages;
-                } else {
-                    $visiblePages[] = '...';
-                    for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
-                        $visiblePages[] = $i;
-                    }
-                    $visiblePages[] = '...';
-                    $visiblePages[] = $pages;
-                }
-            }
-        ?>
-
-        <?php if ($currentPage > 1): ?>
-            <a href="<?= $this->e($buildPageUrl($currentPage - 1)) ?>">Anterior</a>
-        <?php endif; ?>
-
-        <?php foreach ($visiblePages as $item): ?>
-            <?php if ($item === '...'): ?>
-                <span style="margin: 0 6px;">...</span>
-            <?php elseif ($item === $currentPage): ?>
-                <strong style="margin: 0 6px;"><?= $item ?></strong>
-            <?php else: ?>
-                <a href="<?= $this->e($buildPageUrl((int) $item)) ?>" style="margin: 0 6px;"><?= $item ?></a>
-            <?php endif; ?>
-        <?php endforeach; ?>
-
-        <?php if ($currentPage < $pages): ?>
-            <a href="<?= $this->e($buildPageUrl($currentPage + 1)) ?>">Próxima</a>
-        <?php endif; ?>
-    </nav>
-<?php endif; ?>
+<?php $this->insert('components/pagination', ['pagination' => $pagination ?? []]) ?>
 
 <?php $this->insert('layouts/footer') ?>
