@@ -7,26 +7,23 @@
  */
 ?>
 <?php if (!empty($filters)): ?>
-    <div style="margin-bottom: 16px;">
-        <strong>Filtros ativos:</strong>
-
-        <div style="margin-top: 8px;">
-            <?php foreach ($filters as $filter): ?>
-                <span style="
-                    display: inline-block;
-                    background: #f1f5f9;
-                    border: 1px solid #cbd5e1;
-                    border-radius: 999px;
-                    padding: 6px 10px;
-                    margin: 4px 6px 4px 0;
-                    font-size: 14px;
-                ">
-                    <?= $this->e($filter) ?>
-                </span>
-            <?php endforeach; ?>
+    <div class="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-semibold text-slate-700">Filtros ativos</p>
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <?php foreach ($filters as $filter): ?>
+                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-700">
+                            <?= $this->e($filter) ?>
+                        </span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
             <?php if (!empty($clearUrl)): ?>
-                <a href="<?= $this->e($clearUrl) ?>" style="margin-left: 8px;">Limpar todos</a>
+                <a href="<?= $this->e($clearUrl) ?>" class="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                    Limpar todos
+                </a>
             <?php endif; ?>
         </div>
     </div>

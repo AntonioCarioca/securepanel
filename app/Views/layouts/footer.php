@@ -1,11 +1,15 @@
 <?php
 /**
- * Rodapé compartilhado com fechamento do main, body e html.
- *
- * Comentado para estudo: a view deve conter o mínimo possível de lógica.
- * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ * Rodapé compartilhado com fechamento das estruturas abertas em layouts/header.php.
  */
 ?>
-    </main>
+    <?php if (empty($authUser)): ?>
+            </div>
+        </main>
+    <?php else: ?>
+                </main>
+            </div>
+        </div>
+    <?php endif; ?>
 </body>
 </html>

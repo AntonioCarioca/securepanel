@@ -8,35 +8,37 @@
 ?>
 <?php $this->insert('layouts/header', ['title' => 'Login', 'authUser' => $authUser ?? null]) ?>
 
-<h1>Login</h1>
-
-<form action="/login" method="POST">
-    <?php $this->insert('components/csrf') ?>
-
-    <div>
-        <label for="email">E-mail</label><br>
-        <input
-            id="email"
-            type="email"
-            name="email"
-            value="<?= $this->e(old_value('email')) ?>"
-            required
-        >
+<section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/60">
+    <div class="mb-8 text-center">
+        <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-bold text-white shadow-lg shadow-blue-600/30">SP</div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Entrar no SecurePanel</h1>
+        <p class="mt-2 text-sm text-slate-500">Acesse sua conta para gerenciar o sistema.</p>
     </div>
 
-    <br>
+    <form action="/login" method="POST" class="space-y-5">
+        <?php $this->insert('components/csrf') ?>
 
-    <div>
-        <label for="password">Senha</label><br>
-        <input id="password" type="password" name="password" required>
+        <div>
+            <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">E-mail</label>
+            <input id="email" type="email" name="email" value="<?= $this->e(old_value('email')) ?>" required
+                   class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+        </div>
+
+        <div>
+            <label for="password" class="mb-2 block text-sm font-semibold text-slate-700">Senha</label>
+            <input id="password" type="password" name="password" required
+                   class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100">
+        </div>
+
+        <button type="submit" class="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200">
+            Entrar
+        </button>
+    </form>
+
+    <div class="mt-6 flex flex-col gap-2 text-center text-sm">
+        <a href="/forgot-password" class="font-medium text-blue-600 hover:text-blue-700">Esqueci minha senha</a>
+        <span class="text-slate-500">Ainda não tem conta? <a href="/register" class="font-semibold text-blue-600 hover:text-blue-700">Criar conta</a></span>
     </div>
+</section>
 
-    <br>
-
-    <button type="submit">Entrar</button>
-</form>
-
-<p><a href="/forgot-password">Esqueci minha senha</a></p>
-<p><a href="/register">Criar conta</a></p>
-
-<?php $this->insert('layouts/footer') ?>
+<?php $this->insert('layouts/footer', ['authUser' => $authUser ?? null]) ?>

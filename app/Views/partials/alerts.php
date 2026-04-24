@@ -7,13 +7,13 @@
  */
 ?>
 <?php if ($message = $this->flash('error')): ?>
-    <p style="color: #b91c1c; margin-bottom: 16px;">
+    <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 shadow-sm">
         <?= $this->e($message) ?>
-    </p>
+    </div>
 <?php endif; ?>
 
 <?php if ($message = $this->flash('success')): ?>
-    <p style="color: #166534; margin-bottom: 16px;">
+    <div class="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 shadow-sm">
         <?= $this->e($message) ?>
-    </p>
+    </div>
 <?php endif; ?>

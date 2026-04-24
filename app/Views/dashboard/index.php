@@ -8,19 +8,43 @@
 ?>
 <?php $this->insert('layouts/header', ['title' => 'Dashboard', 'authUser' => $authUser ?? null]) ?>
 
-<h1>Dashboard</h1>
+<div class="mb-8">
+    <p class="text-sm font-semibold uppercase tracking-wide text-blue-600">Bem-vindo</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">Olá, <?= $this->e($dashboardUser['name']) ?> 👋</h2>
+    <p class="mt-2 text-slate-500">Resumo rápido da sua conta e atalhos principais do sistema.</p>
+</div>
 
-<p>Bem-vindo, <?= $this->e($dashboardUser['name']) ?>.</p>
-<p>E-mail: <?= $this->e($dashboardUser['email']) ?></p>
-<p>Perfil: <?= $this->e($dashboardUser['role']) ?></p>
+<div class="grid gap-6 md:grid-cols-3">
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">E-mail</p>
+        <p class="mt-2 break-all text-lg font-bold text-slate-900"><?= $this->e($dashboardUser['email']) ?></p>
+    </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Perfil</p>
+        <p class="mt-2 text-lg font-bold uppercase text-slate-900"><?= $this->e($dashboardUser['role']) ?></p>
+    </section>
+
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Status</p>
+        <p class="mt-2 text-lg font-bold text-emerald-600">Autenticado</p>
+    </section>
+</div>
 
 <?php if ($dashboardUser['isAdmin']): ?>
-    <p><a href="/users">Gerenciar usuários</a></p>
+    <div class="mt-8 grid gap-6 md:grid-cols-2">
+        <a href="/users" class="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+            <p class="text-sm font-semibold text-blue-600">Administração</p>
+            <h3 class="mt-2 text-xl font-bold text-slate-900 group-hover:text-blue-700">Gerenciar usuários</h3>
+            <p class="mt-2 text-sm text-slate-500">Crie, edite, filtre e exporte usuários do sistema.</p>
+        </a>
+
+        <a href="/audit-logs" class="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+            <p class="text-sm font-semibold text-blue-600">Segurança</p>
+            <h3 class="mt-2 text-xl font-bold text-slate-900 group-hover:text-blue-700">Audit logs</h3>
+            <p class="mt-2 text-sm text-slate-500">Acompanhe ações importantes realizadas no painel.</p>
+        </a>
+    </div>
 <?php endif; ?>
 
-<form action="/logout" method="POST">
-    <?php $this->insert('components/csrf') ?>
-    <button type="submit">Sair</button>
-</form>
-
-<?php $this->insert('layouts/footer') ?>
+<?php $this->insert('layouts/footer', ['authUser' => $authUser ?? null]) ?>

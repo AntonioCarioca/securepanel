@@ -6,12 +6,7 @@
  * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
  */
 ?>
-<span style="
-    background: <?= $this->e($badge['background']) ?>;
-    color: <?= $this->e($badge['color']) ?>;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-">
+<span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide shadow-sm"
+      style="background: <?= $this->e($badge['background']) ?>; color: <?= $this->e($badge['color']) ?>;">
     <?= $this->e($badge['label']) ?>
 </span>
