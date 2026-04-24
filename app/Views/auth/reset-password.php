@@ -1,3 +1,11 @@
+<?php
+/**
+ * View para cadastrar uma nova senha a partir de um token já validado pelo controller.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Redefinir senha', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Redefinir senha</h1>

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Arquivo de rotas da API JSON.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 use App\Controllers\ApiController;
 
 return [

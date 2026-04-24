@@ -2,10 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * Camada de renderização das views usando a engine Plates.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Core;
 
 use League\Plates\Engine;
 
+/**
+ * Camada de renderização das views usando a engine Plates.
+ */
 class View
 {
     private static ?Engine $engine = null;

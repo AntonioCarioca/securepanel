@@ -2,8 +2,18 @@
 
 declare(strict_types=1);
 
+/**
+ * Classe utilitária para padronizar todas as respostas JSON da API.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Core;
 
+/**
+ * Classe utilitária para padronizar todas as respostas JSON da API.
+ */
 class ApiResponse
 {
     public static function send(

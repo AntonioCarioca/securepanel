@@ -1,3 +1,11 @@
+<?php
+/**
+ * View da tela de cadastro. O controller valida os dados e cria o usuário; esta view só exibe o formulário.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Cadastro', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Cadastro</h1>

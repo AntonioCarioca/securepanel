@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Front controller da aplicação: todas as requisições passam por aqui antes de serem roteadas.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
 use App\Core\ApiResponse;

@@ -1,3 +1,11 @@
+<?php
+/**
+ * Formulário reutilizável para criação e edição de usuários.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <form action="<?= $this->e($form['action']) ?>" method="POST">
     <?php $this->insert('components/csrf') ?>
 

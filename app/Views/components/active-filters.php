@@ -1,3 +1,11 @@
+<?php
+/**
+ * Componente que mostra filtros ativos como badges visuais.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php if (!empty($filters)): ?>
     <div style="margin-bottom: 16px;">
         <strong>Filtros ativos:</strong>

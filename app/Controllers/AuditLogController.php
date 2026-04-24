@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Controlador administrativo responsável pela listagem, filtros, ordenação e exportação dos logs de auditoria.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Controllers;
 
 use App\Core\View;
@@ -9,8 +16,14 @@ use App\Middleware\AdminMiddleware;
 use App\Models\AuditLog;
 use App\Presenters\AuditLogPresenter;
 
+/**
+ * Controlador administrativo responsável pela listagem, filtros, ordenação e exportação dos logs de auditoria.
+ */
 class AuditLogController
 {
+    /**
+     * Lista registros com filtros, paginação e dados preparados para a view.
+     */
     public function index(array $params = []): void
     {
         AdminMiddleware::handle();
@@ -129,6 +142,9 @@ class AuditLogController
         ]);
     }
 
+    /**
+     * Gera e envia um arquivo CSV respeitando os filtros atuais.
+     */
     public function exportCsv(array $params = []): void
     {
         AdminMiddleware::handle();

@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Controlador responsável pelas telas e ações de autenticação web: login, cadastro e logout.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Controllers;
 
 use App\Core\View;
@@ -10,8 +17,14 @@ use Respect\Validation\Validator as v;
 use App\Middleware\GuestMiddleware;
 use App\Services\AuditLogService;
 
+/**
+ * Controlador responsável pelas telas e ações de autenticação web: login, cadastro e logout.
+ */
 class AuthController
 {
+    /**
+     * Exibe a tela de login para visitantes.
+     */
     public function showLogin(): void
     {
         GuestMiddleware::handle();
@@ -19,6 +32,9 @@ class AuthController
         View::render('auth/login');
     }
 
+    /**
+     * Processa o formulário de login, valida credenciais e cria a sessão do usuário.
+     */
     public function login(): void
     {
         GuestMiddleware::handle();
@@ -71,6 +87,9 @@ class AuthController
         redirect('/dashboard');
     }
 
+    /**
+     * Exibe a tela de cadastro para visitantes.
+     */
     public function showRegister(): void
     {
         GuestMiddleware::handle();
@@ -78,6 +97,9 @@ class AuthController
         View::render('auth/register');
     }
 
+    /**
+     * Processa o cadastro público de usuário comum.
+     */
     public function register(): void
     {
         GuestMiddleware::handle();
@@ -133,6 +155,9 @@ class AuthController
         redirect('/dashboard');
     }
 
+    /**
+     * Finaliza a sessão do usuário autenticado.
+     */
     public function logout(): void
     {
         if (!verify_csrf_token($_POST['_csrf'] ?? null)) {

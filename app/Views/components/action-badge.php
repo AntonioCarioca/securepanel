@@ -1,3 +1,11 @@
+<?php
+/**
+ * Componente que renderiza o badge visual da ação do audit log.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <span style="
     display: inline-block;
     padding: 4px 10px;

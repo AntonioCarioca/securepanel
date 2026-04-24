@@ -1,3 +1,11 @@
+<?php
+/**
+ * View da listagem de audit logs. Recebe logs já preparados por presenters e metadados do controller.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Audit Logs', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Audit Logs</h1>

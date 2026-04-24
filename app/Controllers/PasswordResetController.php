@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Controlador responsável pelo fluxo de recuperação de senha: solicitação do link, validação do token e troca da senha.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Controllers;
 
 use App\Core\Mailer;
@@ -12,8 +19,14 @@ use App\Services\AuditLogService;
 use App\Middleware\GuestMiddleware;
 use Respect\Validation\Validator as v;
 
+/**
+ * Controlador responsável pelo fluxo de recuperação de senha: solicitação do link, validação do token e troca da senha.
+ */
 class PasswordResetController
 {
+    /**
+     * Exibe o formulário para solicitar recuperação de senha.
+     */
     public function showForgotPassword(): void
     {
         GuestMiddleware::handle();
@@ -21,6 +34,9 @@ class PasswordResetController
         View::render('auth/forgot-password');
     }
 
+    /**
+     * Valida o e-mail, cria um token de recuperação e envia o link por e-mail.
+     */
     public function sendResetLink(): void
     {
         GuestMiddleware::handle();
@@ -92,6 +108,9 @@ class PasswordResetController
         redirect('/login');
     }
 
+    /**
+     * Valida o token recebido pela URL e exibe o formulário de nova senha.
+     */
     public function showResetPassword(): void
     {
         GuestMiddleware::handle();
@@ -121,6 +140,9 @@ class PasswordResetController
         ]);
     }
 
+    /**
+     * Valida o token e salva a nova senha do usuário.
+     */
     public function resetPassword(): void
     {
         GuestMiddleware::handle();

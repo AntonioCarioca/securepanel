@@ -1,3 +1,11 @@
+<?php
+/**
+ * View da tela de login. A validação e criação de sessão ficam no AuthController; aqui ficam apenas os campos e links.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Login', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Login</h1>

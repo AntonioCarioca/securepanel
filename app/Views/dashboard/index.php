@@ -1,3 +1,11 @@
+<?php
+/**
+ * View do dashboard. Os dados do usuário já chegam preparados pelo DashboardController.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Dashboard', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Dashboard</h1>

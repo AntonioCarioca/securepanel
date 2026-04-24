@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Controlador da API JSON. Centraliza endpoints de usuário autenticado e CRUD de usuários via API.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Controllers;
 
 use App\Core\ApiResponse;
@@ -11,8 +18,14 @@ use App\Models\User;
 use App\Services\AuditLogService;
 use Respect\Validation\Validator as v;
 
+/**
+ * Controlador da API JSON. Centraliza endpoints de usuário autenticado e CRUD de usuários via API.
+ */
 class ApiController
 {
+    /**
+     * Retorna os dados do usuário autenticado na API.
+     */
     public function me(array $params = []): void
     {
         ApiAuthMiddleware::handle();
@@ -30,6 +43,9 @@ class ApiController
         );
     }
 
+    /**
+     * Lista usuários na API com filtros, ordenação e paginação.
+     */
     public function users(array $params = []): void
     {
         ApiAdminMiddleware::handle();
@@ -120,6 +136,9 @@ class ApiController
         );
     }
 
+    /**
+     * Retorna um usuário específico pelo ID.
+     */
     public function showUser(array $params = []): void
     {
         ApiAdminMiddleware::handle();
@@ -140,6 +159,9 @@ class ApiController
         );
     }
 
+    /**
+     * Cria um usuário pela API usando dados JSON ou POST.
+     */
     public function storeUser(array $params = []): void
     {
         ApiAdminMiddleware::handle();
@@ -190,6 +212,9 @@ class ApiController
         );
     }
 
+    /**
+     * Atualiza um usuário pela API usando PUT ou PATCH.
+     */
     public function updateUser(array $params = []): void
     {
         ApiAdminMiddleware::handle();
@@ -268,6 +293,9 @@ class ApiController
         );
     }
 
+    /**
+     * Exclui um usuário pela API, impedindo autoexclusão.
+     */
     public function deleteUser(array $params = []): void
     {
         ApiAdminMiddleware::handle();
@@ -307,6 +335,9 @@ class ApiController
         );
     }
 
+    /**
+     * Retorna os dados recebidos na requisição, priorizando JSON.
+     */
     private function requestData(): array
     {
         if (!empty($GLOBALS['json_input']) && is_array($GLOBALS['json_input'])) {
@@ -316,6 +347,9 @@ class ApiController
         return $_POST;
     }
 
+    /**
+     * Converte o model User em array seguro para resposta JSON.
+     */
     private function transformUser(User $user): array
     {
         return [

@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Controlador administrativo responsável pelo CRUD web de usuários, filtros, paginação e exportação CSV.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Controllers;
 
 use App\Core\View;
@@ -11,8 +18,14 @@ use App\Presenters\UserPresenter;
 use App\Services\AuditLogService;
 use Respect\Validation\Validator as v;
 
+/**
+ * Controlador administrativo responsável pelo CRUD web de usuários, filtros, paginação e exportação CSV.
+ */
 class UserController
 {
+    /**
+     * Lista registros com filtros, paginação e dados preparados para a view.
+     */
     public function index(array $params = []): void
     {
         AdminMiddleware::handle();
@@ -116,6 +129,9 @@ class UserController
         ]);
     }
 
+    /**
+     * Exibe o formulário de criação.
+     */
     public function showCreate(): void
     {
         AdminMiddleware::handle();
@@ -125,6 +141,9 @@ class UserController
         ]);
     }
 
+    /**
+     * Valida e cria um novo registro.
+     */
     public function store(): void
     {
         AdminMiddleware::handle();
@@ -181,6 +200,9 @@ class UserController
         redirect('/users');
     }
 
+    /**
+     * Busca o registro pelo ID e exibe o formulário de edição.
+     */
     public function showEdit(array $params): void
     {
         AdminMiddleware::handle();
@@ -198,6 +220,9 @@ class UserController
         ]);
     }
 
+    /**
+     * Valida e atualiza o registro informado.
+     */
     public function update(array $params): void
     {
         AdminMiddleware::handle();
@@ -276,6 +301,9 @@ class UserController
         redirect('/users');
     }
 
+    /**
+     * Remove o registro informado após validações de segurança.
+     */
     public function destroy(array $params): void
     {
         AdminMiddleware::handle();
@@ -317,6 +345,9 @@ class UserController
         redirect('/users');
     }
 
+    /**
+     * Gera e envia um arquivo CSV respeitando os filtros atuais.
+     */
     public function exportCsv(array $params = []): void
     {
         AdminMiddleware::handle();

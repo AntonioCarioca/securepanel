@@ -2,13 +2,26 @@
 
 declare(strict_types=1);
 
+/**
+ * Classe de envio de e-mails usando PHPMailer e as configurações definidas no .env.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Core;
 
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
+/**
+ * Classe de envio de e-mails usando PHPMailer e as configurações definidas no .env.
+ */
 class Mailer
 {
+    /**
+     * Envia um e-mail SMTP usando PHPMailer.
+     */
     public function send(string $to, string $subject, string $body): bool
     {
         $mail = new PHPMailer(true);

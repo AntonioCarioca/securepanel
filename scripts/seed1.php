@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Script alternativo de seeding mantido no projeto.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 require_once __DIR__ . '/../bootstrap/app.php';
 
 try {

@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/**
+ * Script CLI para executar seeders PHP.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 require_once __DIR__ . '/../bootstrap/app.php';
 
 use Database\Seeders\AdminUserSeeder;

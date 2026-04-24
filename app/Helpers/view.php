@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/**
+ * Arquivo de helpers de apresentação usados pelas views e presenters.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
+/**
+ * Formata data/hora para o padrão brasileiro usado nas views.
+ */
 function format_datetime(mixed $value): string
 {
     if (empty($value)) {
@@ -17,6 +27,9 @@ function format_datetime(mixed $value): string
     return date('d/m/Y H:i', $timestamp);
 }
 
+/**
+ * Função auxiliar format_date_br().
+ */
 function format_date_br(mixed $value): string
 {
     if (empty($value)) {
@@ -32,11 +45,17 @@ function format_date_br(mixed $value): string
     return date('d/m/Y', $timestamp);
 }
 
+/**
+ * Função auxiliar formatDate().
+ */
 function formatDate(string $date): string
 {
     return format_datetime($date);
 }
 
+/**
+ * Função auxiliar user_role_label().
+ */
 function user_role_label(string $role): string
 {
     return match ($role) {
@@ -45,6 +64,9 @@ function user_role_label(string $role): string
     };
 }
 
+/**
+ * Função auxiliar user_role_badge().
+ */
 function user_role_badge(string $role): array
 {
     return match ($role) {
@@ -61,6 +83,9 @@ function user_role_badge(string $role): array
     };
 }
 
+/**
+ * Função auxiliar audit_action_badge().
+ */
 function audit_action_badge(string $action): array
 {
     $badges = [
@@ -123,6 +148,9 @@ function audit_action_badge(string $action): array
     ];
 }
 
+/**
+ * Traduz target_type e target_id para texto amigável.
+ */
 function audit_target_label(?string $targetType, ?int $targetId = null): string
 {
     $labels = [
@@ -148,6 +176,9 @@ function audit_target_label(?string $targetType, ?int $targetId = null): string
     return $label;
 }
 
+/**
+ * Função auxiliar build_url().
+ */
 function build_url(string $path, array $query = []): string
 {
     $query = array_filter($query, static fn($value) => $value !== null && $value !== '');
@@ -159,6 +190,9 @@ function build_url(string $path, array $query = []): string
     return $path . '?' . http_build_query($query);
 }
 
+/**
+ * Função auxiliar sort_url().
+ */
 function sort_url(string $path, string $column, string $currentSort, string $currentDirection, array $query = []): string
 {
     $newDirection = 'asc';
@@ -174,6 +208,9 @@ function sort_url(string $path, string $column, string $currentSort, string $cur
     ]));
 }
 
+/**
+ * Função auxiliar sort_indicator().
+ */
 function sort_indicator(string $column, string $currentSort, string $currentDirection): string
 {
     if ($currentSort !== $column) {
@@ -183,6 +220,9 @@ function sort_indicator(string $column, string $currentSort, string $currentDire
     return $currentDirection === 'asc' ? ' ↑' : ' ↓';
 }
 
+/**
+ * Função auxiliar pagination_items().
+ */
 function pagination_items(int $currentPage, int $totalPages): array
 {
     if ($totalPages <= 7) {
@@ -226,6 +266,9 @@ function pagination_items(int $currentPage, int $totalPages): array
     return $items;
 }
 
+/**
+ * Função auxiliar pagination_view_data().
+ */
 function pagination_view_data(string $path, int $currentPage, int $totalPages, array $query = []): array
 {
     return [
@@ -238,6 +281,9 @@ function pagination_view_data(string $path, int $currentPage, int $totalPages, a
     ];
 }
 
+/**
+ * Função auxiliar user_active_filters().
+ */
 function user_active_filters(string $search, string $role, string $sort, string $direction): array
 {
     $filters = [];
@@ -268,6 +314,9 @@ function user_active_filters(string $search, string $role, string $sort, string 
     return $filters;
 }
 
+/**
+ * Função auxiliar audit_active_filters().
+ */
 function audit_active_filters(string $search, string $action, string $dateFrom, string $dateTo): array
 {
     $filters = [];
@@ -291,26 +340,41 @@ function audit_active_filters(string $search, string $action, string $dateFrom, 
     return $filters;
 }
 
+/**
+ * Função auxiliar old_value().
+ */
 function old_value(string $key, mixed $default = ''): string
 {
     return (string) old($key, $default);
 }
 
+/**
+ * Função auxiliar selected_attr().
+ */
 function selected_attr(mixed $current, mixed $expected): string
 {
     return (string) $current === (string) $expected ? 'selected' : '';
 }
 
+/**
+ * Função auxiliar checked_attr().
+ */
 function checked_attr(mixed $current, mixed $expected): string
 {
     return (string) $current === (string) $expected ? 'checked' : '';
 }
 
+/**
+ * Função auxiliar is_admin_user().
+ */
 function is_admin_user(?array $user): bool
 {
     return ($user['role'] ?? 'user') === 'admin';
 }
 
+/**
+ * Função auxiliar auth_nav_links().
+ */
 function auth_nav_links(?array $authUser): array
 {
     if (empty($authUser)) {
@@ -329,6 +393,9 @@ function auth_nav_links(?array $authUser): array
     return $links;
 }
 
+/**
+ * Função auxiliar dashboard_user_data().
+ */
 function dashboard_user_data(?array $user): array
 {
     return [
@@ -339,6 +406,9 @@ function dashboard_user_data(?array $user): array
     ];
 }
 
+/**
+ * Função auxiliar user_form_data().
+ */
 function user_form_data(mixed $user = null): array
 {
     $isEdit = $user !== null;

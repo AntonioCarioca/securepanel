@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 /**
+ * Arquivo de inicialização da aplicação: carrega Composer, .env, sessão, banco e helpers globais.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
+/**
  * BOOTSTRAP DA APLICAÇÃO
  *
  * Responsabilidades:
@@ -48,17 +55,26 @@ $capsule->addConnection([
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
+/**
+ * Lê uma configuração do .env com valor padrão opcional.
+ */
 function config(string $key, mixed $default = null): mixed
 {
     return $_ENV[$key] ?? $default;
 }
 
+/**
+ * Redireciona o navegador para outra rota e encerra a execução.
+ */
 function redirect(string $path): never
 {
     header('Location: ' . $path);
     exit;
 }
 
+/**
+ * Redireciona para a página anterior usando HTTP_REFERER.
+ */
 function back(): never
 {
     $referer = $_SERVER['HTTP_REFERER'] ?? '/';
@@ -66,11 +82,17 @@ function back(): never
     exit;
 }
 
+/**
+ * Salva uma mensagem temporária na sessão.
+ */
 function flash(string $key, mixed $value): void
 {
     $_SESSION['_flash'][$key] = $value;
 }
 
+/**
+ * Lê e remove uma mensagem temporária da sessão.
+ */
 function getFlash(string $key, mixed $default = null): mixed
 {
     $value = $_SESSION['_flash'][$key] ?? $default;
@@ -78,21 +100,33 @@ function getFlash(string $key, mixed $default = null): mixed
     return $value;
 }
 
+/**
+ * Recupera valor antigo de formulário após erro de validação.
+ */
 function old(string $key, mixed $default = ''): mixed
 {
     return $_SESSION['_old'][$key] ?? $default;
 }
 
+/**
+ * Retorna o usuário autenticado salvo na sessão.
+ */
 function auth(): ?array
 {
     return $_SESSION['auth'] ?? null;
 }
 
+/**
+ * Verifica se não existe usuário autenticado.
+ */
 function guest(): bool
 {
     return !isset($_SESSION['auth']);
 }
 
+/**
+ * Gera ou retorna o token CSRF da sessão.
+ */
 function csrf_token(): string
 {
     if (empty($_SESSION['_csrf'])) {
@@ -102,6 +136,9 @@ function csrf_token(): string
     return $_SESSION['_csrf'];
 }
 
+/**
+ * Compara o token enviado com o token salvo na sessão.
+ */
 function verify_csrf_token(?string $token): bool
 {
     return isset($_SESSION['_csrf']) && is_string($token) && hash_equals($_SESSION['_csrf'], $token);

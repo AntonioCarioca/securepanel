@@ -1,3 +1,11 @@
+<?php
+/**
+ * View da listagem de usuários. Filtros, URLs e presenters são preparados no UserController.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <?php $this->insert('layouts/header', ['title' => 'Usuários', 'authUser' => $authUser ?? null]) ?>
 
 <h1>Usuários</h1>

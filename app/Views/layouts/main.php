@@ -1,3 +1,11 @@
+<?php
+/**
+ * Layout base usado quando uma view utiliza herança do Plates.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

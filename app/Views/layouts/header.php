@@ -1,3 +1,11 @@
+<?php
+/**
+ * Cabeçalho compartilhado com abertura do HTML, título, navbar e mensagens.
+ *
+ * Comentado para estudo: a view deve conter o mínimo possível de lógica.
+ * Regras de negócio ficam nos controllers/services e transformações ficam nos presenters/helpers.
+ */
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>

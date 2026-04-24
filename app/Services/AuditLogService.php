@@ -2,10 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * Serviço responsável por registrar eventos importantes na tabela audit_logs.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
 namespace App\Services;
 
 use App\Models\AuditLog;
 
+/**
+ * Serviço responsável por registrar eventos importantes na tabela audit_logs.
+ */
 class AuditLogService
 {
     public static function log(

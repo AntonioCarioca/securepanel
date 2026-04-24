@@ -1,6 +1,13 @@
 <?php
 
 /**
+ * Arquivo de rotas web, retornando os métodos HTTP, caminhos e handlers dos controllers.
+ *
+ * Comentado para estudo: os comentários explicam o papel do arquivo e os pontos
+ * principais do fluxo, sem alterar a lógica original da aplicação.
+ */
+
+/**
  * DEFINIÇÃO DE ROTAS
  *
  * Cada rota define:
